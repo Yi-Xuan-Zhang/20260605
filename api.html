@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .card {
+            width: calc(100% - 20px);
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cards">
+        <!-- 1.把圖片的再放一層 -->
+        <div class="card"></div>
+    </div>
+    <!-- 1.檢查API -->
+    <script>
+        //3.取得KPI資料
+        let getData = []
+        fetch('https://api.giphy.com/v1/gifs/trending?api_key=shq2JceQb1gUI6sJYeO664CxgXUXWf54shq2JceQb1gUI6sJYeO664CxgXUXWf54&limit=25&offset=0&rating=g&bundle=messaging_non_clips')
+            .then ((res) => res.json())
+            .then.(data) =>{
+                const cards = document.querySelector("#cards");
+
+            }
+    </script>
+</body>
+
+</html>

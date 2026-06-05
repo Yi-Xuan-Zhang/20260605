@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button type="button" id="btn"></button>
+    <script>
+        // 函式
+        // 1.有名字的(具名函式)
+        function 名稱() {
+            // 一開始先把內容計畫好，以便有很多地方要使用的時候可以用
+        }
+        // btn.addEventListener('click', 名稱());  //點擊事件如果有東西共用也可以這樣寫
+
+        // 2.沒有名字的(匿名函式)
+        // (addEventListener)
+        btn.addEventListener('click', function () {
+            // 當下會立刻執行的東西
+        });
+
+
+        // 3.簡化要寫很長的東西(箭頭函式)
+        // 箭頭函式就不會有名字 (forEach,map 進階方法,addEventListener)
+        const btn = document.querySelector("#btn");
+        btn.addEventListener('click', () => { });
+        // array.forEach((element) => { }); forEach 比較常使用到
+
+
+
+    </script>
+</body>
+
+</html>

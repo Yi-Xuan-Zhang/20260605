@@ -13,27 +13,57 @@
         }
 
         .card {
-            width: calc(100% - 20px);
-            
+            width: calc(25% - 8px);
+            height: 200px;
+            background-color: aquamarine;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     </style>
 </head>
 
 <body>
+    <!-- 2.畫面的樣式 -->
     <div id="cards">
-        <!-- 1.把圖片的再放一層 -->
-        <div class="card"></div>
+        <!-- 2-1.把圖片的再放一層 -->
+        <div class="card">
+            <img src="./OOOO" alt="">
+        </div>
     </div>
-    <!-- 1.檢查API -->
+
+    <!-- 1.檢查api有沒有回傳內容回來 -->
+    <!-- 把API資料回傳的內容呈現在HTML上 -->
+    <!-- https://api.giphy.com/v1/gifs/trending?api_key=pbOKq51b2TpimK84MYeSG1tQ75RGcJdk&limit=25&offset=0&rating=g&bundle=messaging_non_clips -->
     <script>
-        //3.取得KPI資料
-        let getData = []
-        fetch('https://api.giphy.com/v1/gifs/trending?api_key=shq2JceQb1gUI6sJYeO664CxgXUXWf54shq2JceQb1gUI6sJYeO664CxgXUXWf54&limit=25&offset=0&rating=g&bundle=messaging_non_clips')
-            .then ((res) => res.json())
-            .then.(data) =>{
+        // data[key].images.original.url
+        // 3.取得API資料
+
+        fetch('https://api.giphy.com/v1/gifs/trending?api_key=pbOKq51b2TpimK84MYeSG1tQ75RGcJdk&limit=25&offset=0&rating=g&bundle=messaging_non_clips')
+            .then((res) => res.json())
+            .then((data) => {
                 const cards = document.querySelector("#cards");
 
-            }
+                // let getData = data.data;
+                // getData.forEach(element => {
+                //     cards.innerHTML += `
+                //         <div class="card">
+                //             <img src="${element.images.original.url}" alt="">
+                //         </div>
+                //     `;
+                //     console.log(element.images.original.url);
+                // });
+
+                // map 搭配join 把陣列串接起來
+                let a = data.data.map((item) => {
+                    return `<div class="card"><img src="${item.images.original.url}" alt=""></div>`;
+                }).join('');
+                console.log(a);
+                cards.innerHTML = a;
+            });
     </script>
 </body>
 

@@ -1,11 +1,342 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>醫院叫號系統</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f8e2d0;
+            font-family: "Microsoft JhengHei", sans-serif;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+
+        .register-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-size: 15px;
+        }
+
+        .btn-register {
+            background: #3498db;
+        }
+
+        .btn-next {
+            background: #57c284;
+        }
+
+        .btn-finish {
+            background: #f19b4e;
+        }
+
+        .btn-register:hover,
+        .btn-next:hover,
+        .btn-finish:hover {
+            opacity: 0.9;
+        }
+
+        .current-patient {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            font-size: 22px;
+            color: #2c3e50;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .next-tag {
+            color: red;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .stats div {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            width: 30%;
+        }
+
+        .action-buttons {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .empty {
+            color: gray;
+        }
+    </style>
 </head>
+
 <body>
-    <script></script>
+    <div class="container">
+        <h1>🏥 醫院叫號系統</h1>
+        <!-- 掛號區 -->
+        <div class="card">
+            <h2>掛號</h2>
+            <div class="register-box">
+                <input type="text" id="patientName" placeholder="請輸入病患姓名">
+                <button class="btn-register" onclick="registerPatient()">新增掛號</button>
+            </div>
+        </div>
+        <!-- 看診區 -->
+        <div class="card">
+            <h2>叫號區</h2>
+            <div class="current-patient" id="currentPatient">目前無病患看診</div>
+            <div class="action-buttons">
+                <button class="btn-next" onclick="callNextPatient()"> 請下一位 </button>
+                <button class="btn-finish" onclick="finishPatient()">看診完成</button>
+            </div>
+        </div>
+        <!-- 統計 -->
+        <div class="card">
+            <h2>統計資訊</h2>
+            <div class="stats">
+                <div>
+                    <h3>等待中</h3>
+                    <p id="waitingCount">0</p>
+                </div>
+                <div>
+                    <h3>看診中</h3>
+                    <p id="servingCount">0</p>
+                </div>
+                <div>
+                    <h3>已完成</h3>
+                    <p id="finishedCount">0</p>
+                </div>
+            </div>
+        </div>
+        <!-- 清單 -->
+        <div class="grid">
+            <!-- 等待清單 -->
+            <div class="card">
+                <h2>等待清單</h2>
+                <ul id="waitingList"></ul>
+            </div>
+            <!-- 已完成 -->
+            <div class="card">
+                <h2>已完成清單</h2>
+                <ul id="finishedList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ======================
+           資料區
+        ====================== */
+        let queue = [];
+        let completed = [];
+        let currentPatient = null;
+        let serialNumber = 1;
+        /* ======================
+           掛號功能
+        ====================== */
+        function registerPatient() {
+            const input = document.querySelector("#patientName");
+            const name = input.value.trim();
+
+            if (!name) {
+                alert("請輸入姓名");
+                return;
+            }
+
+            const patient = {
+                number: String(serialNumber).padStart(3, "0"),
+                name: name,
+                registerTime: new Date().toLocaleString()
+            };
+
+            queue.push(patient);
+            serialNumber++;
+            input.value = "";
+            render();
+        }
+
+        /* ======================
+           請下一位
+        ====================== */
+        function callNextPatient() {
+            // 已有人看診中
+            if (currentPatient) {
+                alert("目前已有病患看診中");
+                return;
+            }
+            if (queue.length === 0) {
+                alert("目前沒有等待病患");
+                return;
+            }
+            currentPatient = queue.shift();
+            render();
+        }
+
+        /* ======================
+           看診完成
+        ====================== */
+
+        function finishPatient() {
+            if (!currentPatient) {
+                alert("目前無病患看診");
+                return;
+            }
+
+            completed.push({
+                ...currentPatient,
+                finishTime: new Date().toLocaleString()
+            });
+
+            currentPatient = null;
+            render();
+        }
+
+        /* ======================
+           畫面更新
+        ====================== */
+        function render() {
+
+            const waitingList = document.querySelector("#waitingList");
+            const finishedList = document.querySelector("#finishedList");
+            const currentArea = document.querySelector("#currentPatient");
+
+            waitingList.innerHTML = "";
+            finishedList.innerHTML = "";
+
+            /* ===== 看診中 ===== */
+            if (currentPatient) {
+                currentArea.innerHTML = `
+                    <div>
+                        <h2>目前看診中</h2>
+                        <p><strong>${currentPatient.number}</strong>號
+                            - ${currentPatient.name}
+                        </p>
+                    </div>
+                `;
+
+            } else {
+                currentArea.innerHTML = "目前無病患看診";
+            }
+
+            /* ===== 等待清單 ===== */
+            if (queue.length === 0) {
+                waitingList.innerHTML =
+                    "<li class='empty'>目前無等待病患</li>";
+            } else {
+                queue.forEach((patient, index) => {
+                    waitingList.innerHTML += `
+                        <li>
+                            ${index === 0
+                            ? "<span class='next-tag'>👉 下一位</span> "
+                            : ""}
+                            ${patient.number}號 ｜ ${patient.name}
+                            <br>
+                            <small>
+                                掛號時間：${patient.registerTime}
+                            </small>
+                        </li>
+                    `;
+                });
+            }
+
+            /* ===== 已完成清單 ===== */
+
+            if (completed.length === 0) {
+                finishedList.innerHTML =
+                    "<li class='empty'>尚無完成紀錄</li>";
+            } else {
+                completed.forEach(patient => {
+                    finishedList.innerHTML += `
+                        <li>
+                            ${patient.number}號 ｜ ${patient.name}
+                            <br>
+                            <small>
+                                完成時間： ${patient.finishTime}
+                            </small>
+                        </li>
+                    `;
+                });
+            }
+
+            /* ===== 統計 ===== */
+            document.querySelector("#waitingCount").textContent = queue.length;
+
+            document.querySelector("#servingCount").textContent = currentPatient ? 1 : 0;
+
+            document.querySelector("#finishedCount").textContent = completed.length;
+        }
+        render();
+
+    </script>
+
 </body>
+
 </html>
